@@ -34,14 +34,14 @@ app.add_middleware(
 
 class UserLoginData(BaseModel):
     first_name: str
-    last_name: str | None = None  # Optional
+    last_name: str = ""  # Optional
     email: str
     provider: str  # "google" or "microsoft"
 
 
 class QueryChatModel(BaseModel):
     first_name: str
-    last_name: str | None = None
+    last_name: str = ""
     email: str
     provider: str
     user_query: str
