@@ -311,7 +311,7 @@
             }
         }
 
-        /* --- IMPROVED Markdown Render Styles --- */
+        /* --- IMPROVED Markdown Render Styles (Unchanged) --- */
         
         /* Base styles for rendered MD (your existing styles are good) */
         .message.bot h1,
@@ -394,7 +394,7 @@
             font-style: italic;
         }
 
-        /* --- FIX: Styles for Prism.js Code Blocks --- */
+        /* --- FIX: Styles for Prism.js Code Blocks (Unchanged) --- */
         
         /* Inline code (for `code` not in a <pre> block) */
         .message.bot p code,
@@ -427,7 +427,7 @@
             font-size: 1em; /* 1em of parent <pre> */
         }
         
-        /* --- FIX: Styles for KaTeX Math Rendering --- */
+        /* --- FIX: Styles for KaTeX Math Rendering (Unchanged) --- */
         .message.bot .katex-display {
             overflow-x: auto;
             overflow-y: hidden;
@@ -437,12 +437,38 @@
         /* --- End of Markdown Style Fixes --- */
 
 
+        /* --- MODIFICATION: Updated chat-form styles --- */
         #chat-form {
             display: flex;
+            align-items: center; /* Vertically center items */
             padding: 20px;
             background: var(--app-gradient);
             border-top: 1px solid #ddd;
         }
+
+        /* --- NEW: Styles for file upload button --- */
+        #file-upload-btn {
+            background: white;
+            color: #007bff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            margin-right: 10px; /* Space from input */
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        
+        #file-upload-btn:hover {
+            background: #f0f0f0;
+        }
+        /* --- END NEW STYLES --- */
+
 
         #user-query {
             flex-grow: 1;
@@ -474,6 +500,7 @@
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         #chat-form button:hover {
@@ -591,6 +618,13 @@
         </div>
 
         <form id="chat-form">
+            <label id="file-upload-btn" for="file-upload-input" title="Upload File">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.49"></path>
+                </svg>
+            </label>
+            <input type="file" id="file-upload-input" style="display: none;">
+            
             <input type="text" id="user-query" placeholder="Type your message..." autocomplete="off">
             <button type="submit" aria-label="Send Message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -632,10 +666,15 @@
         // --- API Endpoints ---
         const LOGIN_API_URL = 'http://127.0.0.1:8000/login';
         const CHAT_API_URL = 'http://127.0.0.1:8000/api/chat/ask';
+        // --- NEW: Upload API Endpoint ---
+        const UPLOAD_API_URL = 'http://127.0.0.1:8000/upload';
 
         // --- Local Storage Keys ---
         const USER_STORAGE_KEY = 'chatUser';
         const THREAD_STORAGE_KEY = 'chatThreadId';
+
+        // --- NEW: Allowed File Extensions ---
+        const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpeg", ".jpg", ".png"];
 
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -652,6 +691,9 @@
         const chatHistory = document.getElementById('chat-history');
         const submitButton = chatForm.querySelector('button[type="submit"]');
         
+        // --- NEW: File Upload DOM Element ---
+        const fileUploadInput = document.getElementById('file-upload-input');
+        
         const previewPanel = document.getElementById('preview-panel');
         const previewIframe = document.getElementById('preview-iframe');
         const previewCloseBtn = document.getElementById('preview-close-btn');
@@ -659,14 +701,12 @@
 
         
         /*
-         * --- FIX: CONFIGURE MARKDOWN, PRISM, and KATEX ---
+         * --- CONFIGURE MARKDOWN, PRISM, and KATEX (Unchanged) ---
          */
 
         // 1. Configure Marked.js (Markdown parser)
-        // We use window.marked because it's loaded from the CDN
         window.marked.setOptions({
             renderer: new window.marked.Renderer(),
-            // Use Prism.js for syntax highlighting
             highlight: function(code, lang) {
                 if (window.Prism.languages[lang]) {
                     return window.Prism.highlight(code, window.Prism.languages[lang], lang);
@@ -675,9 +715,9 @@
                 }
             },
             pedantic: false,
-            gfm: true,       // Enable GitHub Flavored Markdown (for tables, etc.)
-            breaks: true,    // Convert single newlines to <br>
-            sanitize: false, // We trust our API. For untrusted, use DOMPurify.
+            gfm: true,
+            breaks: true,
+            sanitize: false,
             smartypants: false,
             xhtml: false
         });
@@ -685,22 +725,17 @@
         // 2. KaTeX auto-render options (for LaTeX math)
         const katexOptions = {
             delimiters: [
-                {left: '$$', right: '$$', display: true},  // Display math
-                {left: '$', right: '$', display: false},   // Inline math
-                {left: '\\(', right: '\\)', display: false}, // Inline math
-                {left: '\\[', right: '\\]', display: true}  // Display math
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
             ],
-            throwOnError: false // Don't crash if math is invalid
+            throwOnError: false
         };
         
-        /*
-         * --- END OF FIX ---
-         */
-        
+        // --- Helper Functions (Unchanged) ---
 
-        // --- Helper Functions ---
-
-        /** Generates a simple v4 UUID (Unchanged) */
+        /** Generates a simple v4 UUID */
         function generateUUID() {
             if (crypto && crypto.randomUUID) {
                 return crypto.randomUUID();
@@ -711,10 +746,6 @@
             });
         }
         
-        
-        /*
-         * --- FIX: REPLACED CUSTOM MARKDOWN RENDERER ---
-         */
         
         /**
          * Part 1: Renders markdown string to HTML string using Marked.js
@@ -741,10 +772,6 @@
                 console.error("Error during post-processing (KaTeX/Prism):", e);
             }
         }
-        /*
-         * --- END OF FIX ---
-         */
-
 
         function showLoading() {
             loadingDiv.style.display = 'block';
@@ -775,7 +802,7 @@
         }
 
         /**
-         * --- FIX: UPDATED `displayMessage` TO USE NEW RENDERERS ---
+         * UPDATED `displayMessage` TO USE NEW RENDERERS (Unchanged)
          */
         function displayMessage(message, sender, elId = null) {
             const existingEl = elId ? document.getElementById(elId) : null;
@@ -783,16 +810,12 @@
             
             if (!existingEl) {
                 messageEl.classList.add('message', sender);
-                // Append *before* processing so postProcessMessage has a target
                 chatHistory.appendChild(messageEl); 
             }
 
             if (sender === 'bot') {
-                // 1. Render the raw Markdown to HTML
                 messageEl.innerHTML = renderMarkdown(message);
                 messageEl.classList.remove('loading');
-                
-                // 2. Post-process the new HTML for KaTeX and Prism
                 postProcessMessage(messageEl);
 
             } else {
@@ -886,26 +909,21 @@
         }
         
         /**
-         * --- CHAT SUBMIT HANDLER (Unchanged, but now calls new `displayMessage`) ---
+         * --- CHAT SUBMIT HANDLER (Unchanged) ---
          */
         async function handleChatSubmit(event) {
             event.preventDefault();
             const query = queryInput.value.trim();
             if (!query) return;
 
-            // Disable input and button during processing
             queryInput.disabled = true;
             submitButton.disabled = true;
 
-            // Display user message
             displayMessage(query, 'user');
             queryInput.value = '';
 
-            // Show loading animation IMMEDIATELY
             const loaderId = showBotLoading();
-
-            // Force a reflow to ensure the loader is painted before the fetch starts
-            chatHistory.offsetHeight; // This triggers a reflow
+            chatHistory.offsetHeight;
 
             try {
                 const userData = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
@@ -938,26 +956,86 @@
                 }
 
                 const data = await response.json();
-                
-                // Replace the loader with the actual response
-                // This will now trigger the new renderMarkdown + postProcessMessage
                 displayMessage(data.response, 'bot', loaderId);
 
             } catch (error) {
                 console.error('Chat submit error:', error);
-                // Replace the loader with error message
                 displayMessage(`Error: ${error.message}`, 'bot', loaderId);
 
                 if (error.message.includes('User data')) {
                     handleLogout();
                 }
             } finally {
-                // Re-enable input and button
                 queryInput.disabled = false;
                 submitButton.disabled = false;
                 queryInput.focus();
             }
         }
+        
+        // --- NEW: File Upload Handler ---
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return; // User cancelled
+            }
+            
+            const input = event.target;
+            
+            // 1. Validate file extension
+            const fileName = file.name;
+            const fileExt = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+            
+            if (!ALLOWED_EXTENSIONS.includes(fileExt)) {
+                alert(`Invalid file type. Allowed types are: ${ALLOWED_EXTENSIONS.join(', ')}`);
+                input.value = null; // Reset input
+                return;
+            }
+            
+            // 2. Show user message and loading indicator
+            displayMessage(`Uploading ${fileName}...`, 'user');
+            const loaderId = showBotLoading();
+            
+            // 3. Prepare FormData
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // 4. Send API Request
+            try {
+                const response = await fetch(UPLOAD_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                        // NOTE: Do not set Content-Type, 'fetch' will
+                        // automatically set it to 'multipart/form-data'
+                        // with the correct boundary.
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Unknown server error' }));
+                    throw new Error(`Upload failed: ${response.status} ${response.statusText}. Server says: ${errorData.detail || 'No details'}`);
+                }
+                
+                const data = await response.json();
+                
+                // 5. Show success message in chat (replacing loader)
+                // This fulfills the "pop up" and "view button" request
+                // in a way that integrates with the existing UI.
+                const botMessage = `File \`${data.filename}\` uploaded successfully. \n\n[Click here to view or download](${data.file_url})`;
+                displayMessage(botMessage, 'bot', loaderId);
+
+            } catch (error) {
+                console.error('File upload error:', error);
+                // Replace loader with error message
+                displayMessage(`Error uploading file "${fileName}":\n${error.message}`, 'bot', loaderId);
+            } finally {
+                // Clear the file input to allow re-uploading the same file
+                input.value = null;
+            }
+        }
+        // --- END NEW FUNCTION ---
+        
 
         /** Handles user logout (Unchanged) */
         function handleLogout() {
@@ -979,7 +1057,7 @@
             }
         }
 
-        // --- Event Listeners (Unchanged) ---
+        // --- Event Listeners ---
 
         // 1. App Initialization
         document.addEventListener('DOMContentLoaded', initializeAppOnLoad);
@@ -1005,14 +1083,27 @@
         // 5. Preview Panel Close Button
         previewCloseBtn.addEventListener('click', closePreviewPanel);
         
-        // 6. Chat History Click Delegation (for link previews)
+        // --- MODIFICATION: Updated chat history click listener ---
+        // This now handles *all* links in the chat, not just 'chat-link'
         chatHistory.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A' && e.target.classList.contains('chat-link')) {
-                e.preventDefault();
-                const url = e.target.getAttribute('href');
+            // Find the closest ancestor 'A' tag
+            const link = e.target.closest('a');
+            
+            if (link && link.href) {
+                // Prevent default navigation for all links
+                e.preventDefault(); 
+                const url = link.getAttribute('href');
+                
+                // Don't preview internal page anchors
+                if (url.startsWith('#')) return;
+                
+                // Use the existing preview panel
                 openPreviewPanel(url);
             }
         });
+        
+        // --- NEW: Event Listener for File Input ---
+        fileUploadInput.addEventListener('change', handleFileUpload);
 
     </script>
 </body>
