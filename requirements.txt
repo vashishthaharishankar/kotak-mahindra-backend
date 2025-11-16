@@ -4,3 +4,4 @@ requests
 beautifulsoup4
 botocore
 boto3
+psycopg2-binary

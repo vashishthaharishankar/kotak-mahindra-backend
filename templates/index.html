@@ -313,23 +313,16 @@
 
         /* --- IMPROVED Markdown Render Styles (Unchanged) --- */
         
-        /* Base styles for rendered MD (your existing styles are good) */
         .message.bot h1,
         .message.bot h2,
         .message.bot h3 {
             margin: 12px 0 8px 0;
             font-weight: 600;
         }
-
         .message.bot h1 { font-size: 1.5em; }
         .message.bot h2 { font-size: 1.3em; }
         .message.bot h3 { font-size: 1.1em; }
-
-        .message.bot p {
-            margin: 8px 0;
-        }
-
-        /* Stylish table (your existing style is good) */
+        .message.bot p { margin: 8px 0; }
         .message.bot table {
             border-collapse: collapse;
             margin: 12px 0;
@@ -339,53 +332,35 @@
             border-radius: 4px;
             overflow: hidden;
         }
-        
         .message.bot th, 
         .message.bot td {
             border: 1px solid #ddd;
             padding: 10px 14px;
             text-align: left;
         }
-        
         .message.bot th {
             background-color: #f8f9fa;
             font-weight: 600;
             color: #333;
         }
-        
-        .message.bot tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
+        .message.bot tr:nth-child(even) { background-color: #f9f9f9; }
         .message.bot a {
             color: #007bff;
             text-decoration: underline;
             cursor: pointer;
         }
-        
-        .message.bot a:hover {
-            color: #0056b3;
-        }
-        
+        .message.bot a:hover { color: #0056b3; }
         .message.bot ul, 
         .message.bot ol {
             margin: 10px 0;
             padding-left: 24px;
         }
-        
         .message.bot li {
             margin-bottom: 6px;
             line-height: 1.6;
         }
-
-        .message.bot strong {
-            font-weight: 600;
-        }
-
-        .message.bot em {
-            font-style: italic;
-        }
-
+        .message.bot strong { font-weight: 600; }
+        .message.bot em { font-style: italic; }
         .message.bot blockquote {
             border-left: 4px solid #ddd;
             padding-left: 16px;
@@ -394,9 +369,7 @@
             font-style: italic;
         }
 
-        /* --- FIX: Styles for Prism.js Code Blocks (Unchanged) --- */
-        
-        /* Inline code (for `code` not in a <pre> block) */
+        /* --- Styles for Prism.js Code Blocks (Unchanged) --- */
         .message.bot p code,
         .message.bot li code {
             background-color: #f4f4f4;
@@ -406,10 +379,7 @@
             font-size: 0.9em;
             color: #c7254e;
         }
-
-        /* Code blocks (for <pre> tags) */
         .message.bot pre[class*="language-"] {
-            /* Uses the 'prism-tomorrow' theme background */
             background: #2d2d2d; 
             border-radius: 6px;
             padding: 12px;
@@ -417,36 +387,30 @@
             overflow-x: auto;
             font-size: 0.9em;
         }
-        
-        /* Reset code styles *inside* a pre block to inherit from Prism */
         .message.bot pre[class*="language-"] code {
-            color: #ccc; /* Default text color from prism-tomorrow */
+            color: #ccc;
             background: none;
             padding: 0;
             font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-            font-size: 1em; /* 1em of parent <pre> */
+            font-size: 1em;
         }
         
-        /* --- FIX: Styles for KaTeX Math Rendering (Unchanged) --- */
+        /* --- Styles for KaTeX Math Rendering (Unchanged) --- */
         .message.bot .katex-display {
             overflow-x: auto;
             overflow-y: hidden;
             padding: 4px 0;
         }
-        
-        /* --- End of Markdown Style Fixes --- */
 
-
-        /* --- MODIFICATION: Updated chat-form styles --- */
+        /* --- Chat Form Styles (Unchanged) --- */
         #chat-form {
             display: flex;
-            align-items: center; /* Vertically center items */
+            align-items: center;
             padding: 20px;
             background: var(--app-gradient);
             border-top: 1px solid #ddd;
         }
 
-        /* --- NEW: Styles for file upload button --- */
         #file-upload-btn {
             background: white;
             color: #007bff;
@@ -454,21 +418,19 @@
             border-radius: 50%;
             width: 44px;
             height: 44px;
-            margin-right: 10px; /* Space from input */
+            margin-right: 10px;
             cursor: pointer;
             font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
-            flex-shrink: 0; /* Prevent shrinking */
+            flex-shrink: 0;
         }
         
         #file-upload-btn:hover {
             background: #f0f0f0;
         }
-        /* --- END NEW STYLES --- */
-
 
         #user-query {
             flex-grow: 1;
@@ -500,7 +462,7 @@
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
-            flex-shrink: 0; /* Prevent shrinking */
+            flex-shrink: 0;
         }
 
         #chat-form button:hover {
@@ -666,14 +628,13 @@
         // --- API Endpoints ---
         const LOGIN_API_URL = 'http://127.0.0.1:8000/login';
         const CHAT_API_URL = 'http://127.0.0.1:8000/api/chat/ask';
-        // --- NEW: Upload API Endpoint ---
         const UPLOAD_API_URL = 'http://127.0.0.1:8000/upload';
 
         // --- Local Storage Keys ---
         const USER_STORAGE_KEY = 'chatUser';
         const THREAD_STORAGE_KEY = 'chatThreadId';
 
-        // --- NEW: Allowed File Extensions ---
+        // --- Allowed File Extensions ---
         const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpeg", ".jpg", ".png"];
 
         // --- DOM Elements ---
@@ -691,7 +652,6 @@
         const chatHistory = document.getElementById('chat-history');
         const submitButton = chatForm.querySelector('button[type="submit"]');
         
-        // --- NEW: File Upload DOM Element ---
         const fileUploadInput = document.getElementById('file-upload-input');
         
         const previewPanel = document.getElementById('preview-panel');
@@ -704,14 +664,13 @@
          * --- CONFIGURE MARKDOWN, PRISM, and KATEX (Unchanged) ---
          */
 
-        // 1. Configure Marked.js (Markdown parser)
         window.marked.setOptions({
             renderer: new window.marked.Renderer(),
             highlight: function(code, lang) {
                 if (window.Prism.languages[lang]) {
                     return window.Prism.highlight(code, window.Prism.languages[lang], lang);
                 } else {
-                    return code; // fallback to no highlighting
+                    return code;
                 }
             },
             pedantic: false,
@@ -722,7 +681,6 @@
             xhtml: false
         });
         
-        // 2. KaTeX auto-render options (for LaTeX math)
         const katexOptions = {
             delimiters: [
                 {left: '$$', right: '$$', display: true},
@@ -746,25 +704,15 @@
             });
         }
         
-        
-        /**
-         * Part 1: Renders markdown string to HTML string using Marked.js
-         */
         function renderMarkdown(text) {
             return window.marked.parse(text);
         }
 
-        /**
-         * Part 2: Post-processes a DOM element to apply syntax highlighting and math
-         */
         function postProcessMessage(element) {
             try {
-                // 1. Apply KaTeX math rendering
                 if (window.renderMathInElement) {
                     window.renderMathInElement(element, katexOptions);
                 }
-                
-                // 2. Apply Prism syntax highlighting
                 if (window.Prism) {
                     window.Prism.highlightAllUnder(element);
                 }
@@ -801,9 +749,6 @@
             hideLoading();
         }
 
-        /**
-         * UPDATED `displayMessage` TO USE NEW RENDERERS (Unchanged)
-         */
         function displayMessage(message, sender, elId = null) {
             const existingEl = elId ? document.getElementById(elId) : null;
             const messageEl = existingEl || document.createElement('div');
@@ -817,7 +762,6 @@
                 messageEl.innerHTML = renderMarkdown(message);
                 messageEl.classList.remove('loading');
                 postProcessMessage(messageEl);
-
             } else {
                 messageEl.textContent = message;
             }
@@ -825,7 +769,6 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        /** Displays the loading animation (Unchanged) */
         function showBotLoading() {
             const loaderId = `loader-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             const messageEl = document.createElement('div');
@@ -843,21 +786,19 @@
             return loaderId;
         }
         
-        /** Opens the side preview panel (Unchanged) */
         function openPreviewPanel(url) {
             previewTitle.textContent = url;
             previewIframe.src = url;
             previewPanel.classList.add('open');
         }
         
-        /** Closes the side preview panel (Unchanged) */
         function closePreviewPanel() {
             previewPanel.classList.remove('open');
             previewIframe.src = 'about:blank';
             previewTitle.textContent = 'Preview';
         }
 
-        // --- Core Logic (Unchanged) ---
+        // --- Core Logic ---
 
         async function handleSuccessfulLogin(firebaseUser, providerName) {
             showLoading();
@@ -908,9 +849,6 @@
             }
         }
         
-        /**
-         * --- CHAT SUBMIT HANDLER (Unchanged) ---
-         */
         async function handleChatSubmit(event) {
             event.preventDefault();
             const query = queryInput.value.trim();
@@ -972,7 +910,8 @@
             }
         }
         
-        // --- NEW: File Upload Handler ---
+        
+        // --- *** MODIFIED: File Upload Handler *** ---
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) {
@@ -995,19 +934,38 @@
             displayMessage(`Uploading ${fileName}...`, 'user');
             const loaderId = showBotLoading();
             
-            // 3. Prepare FormData
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            // 4. Send API Request
             try {
+                // --- NEW: Get user data and thread_id ---
+                const userData = JSON.parse(localStorage.getItem(USER_STORAGE_KEY));
+                const threadId = localStorage.getItem(THREAD_STORAGE_KEY);
+    
+                if (!userData || !threadId) {
+                    throw new Error('User data or session not found. Please log in again.');
+                }
+                
+                // --- NEW: Generate query_id for this upload event ---
+                const queryId = generateUUID();
+                
+                // --- NEW: Create the payload object ---
+                const payload = {
+                    ...userData, // Spreads first_name, last_name, email, provider
+                    user_query: "null", // As requested in cURL
+                    thread_id: threadId,
+                    query_id: queryId
+                };
+                
+                // 3. Prepare FormData (MODIFIED)
+                const formData = new FormData();
+                formData.append('file', file);
+                // --- NEW: Append the payload as a JSON string ---
+                formData.append('payload', JSON.stringify(payload));
+                
+                // 4. Send API Request
                 const response = await fetch(UPLOAD_API_URL, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json'
-                        // NOTE: Do not set Content-Type, 'fetch' will
-                        // automatically set it to 'multipart/form-data'
-                        // with the correct boundary.
+                        // Content-Type is set automatically by fetch for FormData
                     },
                     body: formData
                 });
@@ -1019,25 +977,25 @@
                 
                 const data = await response.json();
                 
-                // 5. Show success message in chat (replacing loader)
-                // This fulfills the "pop up" and "view button" request
-                // in a way that integrates with the existing UI.
+                // 5. Show success message in chat
                 const botMessage = `File \`${data.filename}\` uploaded successfully. \n\n[Click here to view or download](${data.file_url})`;
                 displayMessage(botMessage, 'bot', loaderId);
 
             } catch (error) {
                 console.error('File upload error:', error);
-                // Replace loader with error message
                 displayMessage(`Error uploading file "${fileName}":\n${error.message}`, 'bot', loaderId);
+                
+                // --- NEW: Handle auth error consistently ---
+                if (error.message.includes('User data')) {
+                    handleLogout();
+                }
             } finally {
-                // Clear the file input to allow re-uploading the same file
-                input.value = null;
+                input.value = null; // Clear input
             }
         }
-        // --- END NEW FUNCTION ---
+        // --- *** END OF MODIFICATION *** ---
         
 
-        /** Handles user logout (Unchanged) */
         function handleLogout() {
             localStorage.removeItem(USER_STORAGE_KEY);
             localStorage.removeItem(THREAD_STORAGE_KEY);
@@ -1045,7 +1003,6 @@
             showLoginScreen();
         }
 
-        /** Main function to check login state on page load. (Unchanged) */
         function initializeAppOnLoad() {
             const userData = localStorage.getItem(USER_STORAGE_KEY);
             const threadId = localStorage.getItem(THREAD_STORAGE_KEY);
@@ -1057,12 +1014,10 @@
             }
         }
 
-        // --- Event Listeners ---
+        // --- Event Listeners (Unchanged) ---
 
-        // 1. App Initialization
         document.addEventListener('DOMContentLoaded', initializeAppOnLoad);
 
-        // 2. Login Buttons
         googleBtn.addEventListener('click', async () => {
             const provider = new GoogleAuthProvider();
             try {
@@ -1074,35 +1029,21 @@
             }
         });
 
-        // 3. Chat Form
         chatForm.addEventListener('submit', handleChatSubmit);
-
-        // 4. Logout Button
         logoutBtn.addEventListener('click', handleLogout);
-
-        // 5. Preview Panel Close Button
         previewCloseBtn.addEventListener('click', closePreviewPanel);
         
-        // --- MODIFICATION: Updated chat history click listener ---
-        // This now handles *all* links in the chat, not just 'chat-link'
         chatHistory.addEventListener('click', (e) => {
-            // Find the closest ancestor 'A' tag
             const link = e.target.closest('a');
-            
             if (link && link.href) {
-                // Prevent default navigation for all links
                 e.preventDefault(); 
                 const url = link.getAttribute('href');
-                
-                // Don't preview internal page anchors
                 if (url.startsWith('#')) return;
-                
-                // Use the existing preview panel
                 openPreviewPanel(url);
             }
         });
         
-        // --- NEW: Event Listener for File Input ---
+        // --- Listener for File Input (Unchanged) ---
         fileUploadInput.addEventListener('change', handleFileUpload);
 
     </script>

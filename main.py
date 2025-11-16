@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, File, UploadFile, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -7,9 +7,12 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import json
 import boto3
 from botocore.exceptions import ClientError
 from lambda_handler_requests import call_login_lambda, call_chat_ask_lambda
+from database.update_users import handle_user_login
+from database.update_users_chats import add_user_chat
 # from rag_pipeline import main_execution_flow
 # from salesforce_client import create_salesforce_lead
 
@@ -65,6 +68,10 @@ async def create_lead_in_salesforce(user: UserLoginData):
         email=user.email,
         provider=user.provider,
     )
+    try:
+        handle_user_login(response) #type: ignore
+    except Exception as err:
+        print(f"Got error in handle_user_login: {err}")
 
     return response
 
@@ -81,6 +88,18 @@ async def ask(data: QueryChatModel):
         thread_id=data.thread_id,
         query_id=data.query_id,
     )
+    input_data = {
+        "email": data.email,
+        "s3_uri": None,
+        "user_query": data.user_query,
+        "bot_response": response["response"], #type: ignore
+        "thread_id": data.thread_id,
+        "query_id": data.query_id,
+    }
+    try:
+        add_user_chat(input_data)
+    except Exception as err:
+        print(f"Got error in add_user_chat: {err}")
 
     return response
 
@@ -111,7 +130,7 @@ except Exception as e:
 
 
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), payload: str = Form(...)):
     """
     Uploads a file to the S3 bucket specified in the configuration.
 
@@ -174,6 +193,20 @@ async def upload_file(file: UploadFile = File(...)):
     finally:
         # It's good practice to close the file
         await file.close()
+
+    data = QueryChatModel(**json.loads(payload))
+    input_data = {
+        "email": data.email,
+        "s3_uri": file_url,
+        "user_query": None,
+        "bot_response": None, #type: ignore
+        "thread_id": data.thread_id,
+        "query_id": data.query_id,
+    }
+    try:
+        add_user_chat(input_data)
+    except Exception as err:
+        print(f"Got error in add_user_chat: {err}")
 
     # --- Success Response ---
     return {
