@@ -1,6 +1,6 @@
-fastapi
-uvicorn[standard]
-pydantic
+fastapi[all]
 python-dotenv
 requests
 beautifulsoup4
+botocore
+boto3
