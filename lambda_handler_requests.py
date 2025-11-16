@@ -7,7 +7,7 @@ API_BASE_URL = "https://rc65jvqe43f5gwshmio73q56vq0gbhge.lambda-url.ap-south-1.o
 
 # ---------------------
 
-def call_login_lambda(first_name: str, last_name: str|None, email: str, provider: str):
+def call_login_lambda(first_name: str, last_name: str, email: str, provider: str):
     """
     Calls the /login endpoint on your Lambda function.
     """
@@ -45,7 +45,7 @@ def call_login_lambda(first_name: str, last_name: str|None, email: str, provider
     return None
 
 def call_chat_ask_lambda(first_name: str, email: str, user_query: str, thread_id: str, 
-                  last_name: str | None = None, provider: str = "google", query_id: str = "q_123"):
+                  last_name: str  = "", provider: str = "google", query_id: str = "q_123"):
     """
     Calls the /api/chat/ask endpoint on your Lambda function.
     """
